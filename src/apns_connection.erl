@@ -100,15 +100,8 @@ default_connection(cert, ConnectionName) ->
    , keyfile    => Keyfile
    , type       => cert
   };
-default_connection(token, ConnectionName) ->
-  {ok, Host} = application:get_env(apns, apple_host),
-  {ok, Port} = application:get_env(apns, apple_port),
-
-  #{ name       => ConnectionName
-   , apple_host => Host
-   , apple_port => Port
-   , type       => token
-  }.
+default_connection(token, _ConnectionName) ->
+  {error, unsupported}.
 
 %% @doc Close the connection with APNs gracefully
 -spec close_connection(name()) -> ok.
