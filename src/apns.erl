@@ -23,6 +23,7 @@
 -export([ start/0
         , stop/0
         , connect/2
+        , connect/3
         , close_connection/1
         , push_notification/3
         , push_notification/4
@@ -73,6 +74,13 @@ stop() ->
 connect(Type, ConnectionName) ->
   DefaultConnection = apns_connection:default_connection(Type, ConnectionName),
   connect(DefaultConnection).
+%%
+%% @doc Connects to APNs service with Provider Certificate
+-spec connect( apns_connection:type(), apns_connection:name(), erlang:map()) ->
+  {ok, pid()} | {error, timeout}.
+connect(Type, ConnectionName, Opts) ->
+  DefaultConnection = apns_connection:connection(Type, ConnectionName, Opts),
+  connect(DefaultConnection).
 
 %% @doc Closes the connection with APNs service.
 -spec close_connection(apns_connection:name()) -> ok.
@@ -122,8 +130,7 @@ default_headers() ->
 %% Connects to APNs service
 -spec connect(apns_connection:connection()) -> {ok, pid()} | {error, timeout}.
 connect(Connection) ->
-  {ok, _} = apns_sup:create_connection(Connection),
-  Server = whereis(apns_connection:name(Connection)),
+  {ok, Server} = apns_sup:create_connection(Connection),
   apns_connection:wait_apns_connection_up(Server).
 
 %% Build a headers() structure from environment variables.
@@ -132,7 +139,7 @@ default_headers([], Headers) ->
   Headers;
 default_headers([Key | Keys], Headers) ->
   case application:get_env(apns, Key) of
-    {ok, undefined} ->
+    undefined ->
       default_headers(Keys, Headers);
     {ok, Value} ->
       NewHeaders = Headers#{Key => to_binary(Value)},

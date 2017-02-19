@@ -23,6 +23,7 @@
 
 %% API
 -export([ start_link/2
+        , connection/3
         , default_connection/2
         , name/1
         , host/1
@@ -82,16 +83,24 @@
 -spec start_link(connection(), pid()) ->
   {ok, Pid :: pid()} | ignore | {error, Reason :: term()}.
 start_link(Connection, Client) ->
-  Name = name(Connection),
-  gen_server:start_link({local, Name}, ?MODULE, {Connection, Client}, []).
+  case name(Connection) of
+      undefined ->
+          gen_server:start_link(?MODULE, {Connection, Client}, []);
+      Name ->
+          gen_server:start_link({local, Name}, ?MODULE, {Connection, Client}, [])
+  end.
+
+connection(cert, ConnectionName, Opts) when is_map(Opts) ->
+    Default = default_connection(cert, ConnectionName),
+    maps:merge(Default, Opts).
 
 %% @doc Builds a connection() map from the environment variables.
 -spec default_connection(type(), name()) -> connection().
 default_connection(cert, ConnectionName) ->
-  {ok, Host} = application:get_env(apns, apple_host),
-  {ok, Port} = application:get_env(apns, apple_port),
-  {ok, Certfile} = application:get_env(apns, certfile),
-  {ok, Keyfile} = application:get_env(apns, keyfile),
+  Host = application:get_env(apns, apple_host, undefined),
+  Port = application:get_env(apns, apple_port, undefined),
+  Certfile = application:get_env(apns, certfile, undefined),
+  Keyfile = application:get_env(apns, keyfile, undefined),
 
   #{ name       => ConnectionName
    , apple_host => Host
