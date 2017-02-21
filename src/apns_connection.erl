@@ -56,6 +56,8 @@
              , type/0
              ]).
 
+-define(DefaultTimeout, 10000).
+
 -type name()         :: atom().
 -type host()         :: string() | inet:ip_address().
 -type path()         :: string().
@@ -90,6 +92,7 @@ start_link(Connection, Client) ->
           gen_server:start_link({local, Name}, ?MODULE, {Connection, Client}, [])
   end.
 
+-spec connection(type(), name(), erlang:map()) -> connection().
 connection(cert, ConnectionName, Opts) when is_map(Opts) ->
     Default = default_connection(cert, ConnectionName),
     maps:merge(Default, Opts).
@@ -199,7 +202,7 @@ handle_info( {'DOWN', GunMonitor, process, GunConnPid, _}
   {GunMonitor2, GunConnPid2} = open_gun_connection(Connection),
   {noreply, State#{gun_connection => GunConnPid2, gun_monitor => GunMonitor2}};
 handle_info(timeout, #{gun_connection := GunConn, client := Client} = State) ->
-  {ok, Timeout} = application:get_env(apns, timeout),
+  Timeout = application:get_env(apns, timeout, ?DefaultTimeout),
   case gun:await_up(GunConn, Timeout) of
     {ok, http2} ->
       Client ! {connection_up, self()},
