@@ -1,6 +1,9 @@
 {"1.1.0",
 [{<<"aleppo">>,{pkg,<<"inaka_aleppo">>,<<"1.0.0">>},3},
- {<<"base64url">>,{pkg,<<"base64url">>,<<"0.0.1">>},0},
+ {<<"base64url">>,
+  {git,"git@github.com:Phonebooth/base64url.git",
+       {ref,"bf1360685da704c8453aba2268c4698c959d2ba4"}},
+  0},
  {<<"cowlib">>,
   {git,"https://github.com/ninenines/cowlib",
        {ref,"0e7abe0b24593f131add272c275406d8ed231805"}},
@@ -23,7 +26,6 @@
 [
 {pkg_hash,[
  {<<"aleppo">>, <<"8DB14CF16BB8C263C14FF4C3F69F64D7C849D40888944F4204D2CA74F1114CEB">>},
- {<<"base64url">>, <<"36A90125F5948E3AFD7BE97662A1504B934DD5DAC78451CA6E9ABF85A10286BE">>},
  {<<"elvis">>, <<"5424DBD17BEC4265A6808F49064CC1A8D2D1B593B5C4E94E747EDB157ABDE6DE">>},
  {<<"goldrush">>, <<"349A351D17C71C2FDAA18A6C2697562ABE136FEC945F147B381F0CF313160228">>},
  {<<"jsx">>, <<"1453B4EB3615ACB3E2CD0A105D27E6761E2ED2E501AC0B390F5BBEC497669846">>},
